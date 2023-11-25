@@ -1,4 +1,4 @@
-FILES:= main
+FILES:= main ft_traceroute
 NAME:= ft_traceroute
 
 # ------------------
