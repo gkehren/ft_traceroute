@@ -38,9 +38,16 @@ void	ft_traceroute(t_env* env)
 		struct sockaddr_in from_addr;
 		if (recv_icmp_packet(env, &from_addr) < 0)
 		{
-			perror("recv_icmp_packet");
-			close(env->sockfd);
-			exit(EXIT_FAILURE);
+			if (errno == EAGAIN || errno == EWOULDBLOCK)
+			{
+				printf(" *  *  *\n"); // Timeout
+			}
+			else
+			{
+				perror("recv_icmp_packet");
+				close(env->sockfd);
+				exit(EXIT_FAILURE);
+			}
 		}
 
 		// Print result
@@ -64,6 +71,14 @@ void	init_socket(t_env *env, char *arg)
 	if (env->sockfd < 0)
 	{
 		perror("socket");
+		exit(EXIT_FAILURE);
+	}
+
+	struct timeval	timeout = {1, 0};
+	if (setsockopt(env->sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0)
+	{
+		perror("setsockopt");
+		close(env->sockfd);
 		exit(EXIT_FAILURE);
 	}
 
