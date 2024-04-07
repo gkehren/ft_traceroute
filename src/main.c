@@ -51,6 +51,8 @@ void	ft_traceroute(t_env* env)
 		}
 
 		// Print result
+		gettimeofday(&env->end_time, NULL);
+		env->rtt = get_elapsed_time(&env->start_time, &env->end_time);
 		display_result(env, &from_addr);
 
 		// Check if destination reached

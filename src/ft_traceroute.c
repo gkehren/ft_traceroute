@@ -76,11 +76,7 @@ int	recv_icmp_packet(t_env *env, struct sockaddr_in *from_addr)
 
 	// Check if response is ICMP_ECHOREPLY
 	if (icmp_header->type == ICMP_ECHOREPLY)
-	{
-		gettimeofday(&env->end_time, NULL);
-		env->rtt = get_elapsed_time(&env->start_time, &env->end_time);
 		return (0);
-	}
 
 	return (1);
 }

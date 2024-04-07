@@ -35,7 +35,8 @@ typedef struct	s_env
 	double				rtt;
 }	t_env;
 
-int	send_icmp_packet(t_env *env);
-int	recv_icmp_packet(t_env *env, struct sockaddr_in *from_addr);
+int		send_icmp_packet(t_env *env);
+int		recv_icmp_packet(t_env *env, struct sockaddr_in *from_addr);
+double	get_elapsed_time(struct timeval *start_time, struct timeval *end_time);
 
 #endif
