@@ -2,9 +2,10 @@
 
 void	display_result(t_env *env, struct sockaddr_in *from_addr)
 {
+	static char prev_host[NI_MAXHOST];
+	char	host[NI_MAXHOST];
 	struct	addrinfo	hints;
 	struct	addrinfo	*res;
-	char	host[NI_MAXHOST];
 
 	memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_family = AF_INET;
@@ -18,46 +19,60 @@ void	display_result(t_env *env, struct sockaddr_in *from_addr)
 
 	freeaddrinfo(res);
 
-	printf(" %d  %s (%s)  %.3f ms\n", env->ttl, host, inet_ntoa(from_addr->sin_addr), env->rtt);
+	if (strcmp(prev_host, host) != 0)
+	{
+		printf(" %s (%s)  %.3f ms ", host, inet_ntoa(from_addr->sin_addr), env->rtt);
+		strncpy(prev_host, host, NI_MAXHOST);
+	}
+	else
+		printf(" %.3f ms ", env->rtt);
 }
 
 void	ft_traceroute(t_env* env)
 {
 	env->ttl = 1;
+	int reached = 0;
 	while (env->ttl <= MAX_HOPS)
 	{
-		// Send ICMP packet
-		if (send_icmp_packet(env) < 0)
+		if (reached)
+			break;
+		printf(" %d ", env->ttl);
+		for (int i = 0; i < 3; i++)
 		{
-			perror("send_icmp_packet");
-			close(env->sockfd);
-			exit(EXIT_FAILURE);
-		}
-
-		// Receive ICMP packet
-		struct sockaddr_in from_addr;
-		if (recv_icmp_packet(env, &from_addr) < 0)
-		{
-			if (errno == EAGAIN || errno == EWOULDBLOCK)
+			// Send ICMP packet
+			if (send_icmp_packet(env) < 0)
 			{
-				printf(" *  *  *\n"); // Timeout
-			}
-			else
-			{
-				perror("recv_icmp_packet");
+				perror("send_icmp_packet");
 				close(env->sockfd);
 				exit(EXIT_FAILURE);
 			}
+
+			// Receive ICMP packet
+			struct sockaddr_in from_addr;
+			if (recv_icmp_packet(env, &from_addr) < 0)
+			{
+				if (errno == EAGAIN || errno == EWOULDBLOCK)
+					printf(" * "); // Timeout
+				else
+				{
+					perror("recv_icmp_packet");
+					close(env->sockfd);
+					exit(EXIT_FAILURE);
+				}
+			}
+			else
+			{
+				// Print result
+				gettimeofday(&env->end_time, NULL);
+				env->rtt = get_elapsed_time(&env->start_time, &env->end_time);
+				display_result(env, &from_addr);
+			}
+
+			// Check if destination reached
+			if (from_addr.sin_addr.s_addr == env->dest_addr.sin_addr.s_addr)
+				reached = 1;
 		}
-
-		// Print result
-		gettimeofday(&env->end_time, NULL);
-		env->rtt = get_elapsed_time(&env->start_time, &env->end_time);
-		display_result(env, &from_addr);
-
-		// Check if destination reached
-		if (from_addr.sin_addr.s_addr == env->dest_addr.sin_addr.s_addr)
-			break;
+		printf("\n");
 		env->ttl++;
 	}
 }
