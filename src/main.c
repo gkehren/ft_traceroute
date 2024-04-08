@@ -121,8 +121,17 @@ int main(int argc, char **argv)
 
 	if (argc != 2)
 	{
-		fprintf(stderr, "Usage: %s <destination>\n", argv[0]);
+		fprintf(stderr, "Usage: %s <host>\n", argv[0]);
 		exit(EXIT_FAILURE);
+	}
+	if (strcmp(argv[1], "--help") == 0)
+	{
+		printf("Usage:\n");
+		printf(" ft_traceroute <host>\n");
+		printf("Options:\n");
+		printf(" <host> Destination IP address or hostname\n");
+		printf(" --help       Display this information\n");
+		exit(EXIT_SUCCESS);
 	}
 	env.rtt = 0;
 	init_socket(&env, argv[1]);
