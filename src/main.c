@@ -32,12 +32,12 @@ void	ft_traceroute(t_env* env)
 {
 	env->ttl = 1;
 	int reached = 0;
-	while (env->ttl <= MAX_HOPS)
+	while (env->ttl <= env->max_hops)
 	{
 		if (reached)
 			break;
 		printf(" %d ", env->ttl);
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < env->nqueries; i++)
 		{
 			// Send ICMP packet
 			if (send_icmp_packet(env) < 0)
@@ -77,7 +77,7 @@ void	ft_traceroute(t_env* env)
 	}
 }
 
-void	init_socket(t_env *env, char *arg)
+void	init_socket(t_env *env)
 {
 	struct addrinfo		hints;
 	struct addrinfo		*result;
@@ -101,7 +101,7 @@ void	init_socket(t_env *env, char *arg)
 
 	hints = (struct addrinfo){0};
 	hints.ai_family = AF_INET;
-	err = getaddrinfo(arg, NULL, &hints, &result);
+	err = getaddrinfo(env->host, NULL, &hints, &result);
 	if (err != 0)
 	{
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(err));
@@ -119,23 +119,9 @@ int main(int argc, char **argv)
 {
 	t_env	env;
 
-	if (argc != 2)
-	{
-		fprintf(stderr, "Usage: %s <host>\n", argv[0]);
-		exit(EXIT_FAILURE);
-	}
-	if (strcmp(argv[1], "--help") == 0)
-	{
-		printf("Usage:\n");
-		printf(" ft_traceroute <host>\n");
-		printf("Options:\n");
-		printf(" <host> Destination IP address or hostname\n");
-		printf(" --help       Display this information\n");
-		exit(EXIT_SUCCESS);
-	}
-	env.rtt = 0;
-	init_socket(&env, argv[1]);
-	printf("traceroute to %s (%s), %d hops max, %d byte packets\n", argv[1], inet_ntoa(env.dest_addr.sin_addr), MAX_HOPS, PACKET_SIZE);
+	parse_args(&env, argc, argv);
+	init_socket(&env);
+	printf("traceroute to %s (%s), %d hops max, %d byte packets\n", env.host, inet_ntoa(env.dest_addr.sin_addr), env.max_hops, PACKET_SIZE);
 	ft_traceroute(&env);
 	close(env.sockfd);
 	return (EXIT_SUCCESS);

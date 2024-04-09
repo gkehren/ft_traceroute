@@ -16,8 +16,9 @@
 #include <netdb.h>
 #include <errno.h>
 
-#define MAX_HOPS 30
 #define PACKET_SIZE 60
+#define DEFAULT_MAX_HOPS 30
+#define DEFAULT_NQUERIES 3
 
 typedef struct	s_packet
 {
@@ -27,16 +28,22 @@ typedef struct	s_packet
 
 typedef struct	s_env
 {
+	char				*host;
 	int					sockfd;
 	struct sockaddr_in	dest_addr;
 	int					ttl;
 	struct timeval		start_time;
 	struct timeval		end_time;
 	double				rtt;
+
+	// Bonus
+	int					max_hops;
+	int					nqueries;
 }	t_env;
 
 int		send_icmp_packet(t_env *env);
 int		recv_icmp_packet(t_env *env, struct sockaddr_in *from_addr);
 double	get_elapsed_time(struct timeval *start_time, struct timeval *end_time);
+void	parse_args(t_env *env, int argc, char **argv);
 
 #endif
