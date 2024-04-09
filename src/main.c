@@ -104,7 +104,7 @@ void	init_socket(t_env *env)
 	err = getaddrinfo(env->host, NULL, &hints, &result);
 	if (err != 0)
 	{
-		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(err));
+		fprintf(stderr, "%s: %s\n", env->host, gai_strerror(err));
 		close(env->sockfd);
 		exit(EXIT_FAILURE);
 	}
