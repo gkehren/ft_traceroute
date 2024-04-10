@@ -39,6 +39,8 @@ typedef struct	s_env
 	// Bonus
 	int					max_hops;
 	int					nqueries;
+	int					tos;
+	int 				seq;
 }	t_env;
 
 int		send_icmp_packet(t_env *env);

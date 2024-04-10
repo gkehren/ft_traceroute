@@ -1,5 +1,15 @@
 #include "../include/ft_traceroute.h"
 
+void	init_default_env(t_env *env)
+{
+	env->ttl = 1; // time to live
+	env->rtt = 0; // round-trip time
+	env->max_hops = DEFAULT_MAX_HOPS; // max number of hops
+	env->nqueries = DEFAULT_NQUERIES; // number of queries per hop
+	env->tos = 8; // 8 = IPTOS_LOWDELAY | 16 = IPTOS_THROUGHPUT | 32 = IPTOS_RELIABILITY | 128 = IPTOS_MINCOST
+	env->seq = 0; // ICMP sequence number
+}
+
 void	parse_args(t_env *env, int argc, char **argv)
 {
 	if (argc < 2)
@@ -7,9 +17,7 @@ void	parse_args(t_env *env, int argc, char **argv)
 		fprintf(stderr, "Usage: %s <host>\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
-	env->rtt = 0;
-	env->max_hops = DEFAULT_MAX_HOPS;
-	env->nqueries = DEFAULT_NQUERIES;
+	init_default_env(env);
 	for (int i = 1; i < argc; i++)
 	{
 		if (strcmp(argv[i], "--help") == 0)
@@ -40,40 +48,31 @@ void	parse_args(t_env *env, int argc, char **argv)
 				exit(EXIT_FAILURE);
 			}
 		}
+		else if (strncmp(argv[i], "-t=", 3) == 0)
+		{
+			env->tos = atoi(argv[i] + 3);
+			if (env->tos < 0 || env->tos > 255)
+			{
+				fprintf(stderr, "Invalid type of service value\n");
+				exit(EXIT_FAILURE);
+			}
+		}
+		else if (strncmp(argv[i], "-p=", 3) == 0)
+		{
+			env->seq = atoi(argv[i] + 3);
+			if (env->seq <= 0 || env->seq > 65535)
+			{
+				fprintf(stderr, "Invalid port value\n");
+				exit(EXIT_FAILURE);
+			}
+		}
 		else
 		{
 			env->host = argv[i];
 		}
-		//else if (strncmp(argv[i], "-t=", 3) == 0)
-		//{
-		//	env->tos = atoi(argv[i] + 3);
-		//	if (env->tos < 0 || env->tos > 255)
-		//	{
-		//		fprintf(stderr, "Invalid type of service value\n");
-		//		exit(EXIT_FAILURE);
-		//	}
-		//}
-		//else if (strncmp(argv[i], "-l=", 3) == 0)
-		//{
-		//	env->flow_label = atoi(argv[i] + 3);
-		//	if (env->flow_label < 0 || env->flow_label > 1048575)
-		//	{
-		//		fprintf(stderr, "Invalid flow label value\n");
-		//		exit(EXIT_FAILURE);
-		//	}
-		//}
 		//else if (strncmp(argv[i], "-i=", 3) == 0)
 		//{
 		//	env->interface = argv[i] + 3;
-		//}
-		//else if (strncmp(argv[i], "-p=", 3) == 0)
-		//{
-		//	env->port = atoi(argv[i] + 3);
-		//	if (env->port <= 0 || env->port > 65535)
-		//	{
-		//		fprintf(stderr, "Invalid port value\n");
-		//		exit(EXIT_FAILURE);
-		//	}
 		//}
 		//else if (strncmp(argv[i], "-s=", 3) == 0)
 		//{
@@ -89,6 +88,5 @@ void	parse_args(t_env *env, int argc, char **argv)
 		// -q=<nprobes> Set the number of probes per hop
 		// -N=<nqueries> Set the number of queries per probe
 		// -t=<tos> Set the type of service
-		// -l=<flow_label> Set the flow label
 	}
 }

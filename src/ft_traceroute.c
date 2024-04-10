@@ -34,11 +34,9 @@ int send_icmp_packet(t_env *env)
 	memset(&packet, 0, sizeof(t_packet));
 
 	// Set ICMP header
-	packet.header.type = ICMP_ECHO; // Type
-	packet.header.code = 0; // Code
+	packet.header.type = ICMP_ECHO; // Type=
 	packet.header.un.echo.id = htons(getpid()); // ID
-	packet.header.un.echo.sequence = htons(env->ttl); // Sequence
-	packet.header.checksum = 0; // Checksum
+	packet.header.un.echo.sequence = env->seq++; // Sequence
 
 	packet.header.checksum = calculate_checksum((uint16_t *)&packet, sizeof(t_packet));
 

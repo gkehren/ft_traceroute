@@ -30,7 +30,6 @@ void	display_result(t_env *env, struct sockaddr_in *from_addr)
 
 void	ft_traceroute(t_env* env)
 {
-	env->ttl = 1;
 	int reached = 0;
 	while (env->ttl <= env->max_hops)
 	{
@@ -93,6 +92,14 @@ void	init_socket(t_env *env)
 
 	struct timeval	timeout = {1, 0};
 	if (setsockopt(env->sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0)
+	{
+		perror("setsockopt");
+		close(env->sockfd);
+		exit(EXIT_FAILURE);
+	}
+
+	// Bonus (make another function for this part)
+	if (setsockopt(env->sockfd, IPPROTO_IP, IP_TOS, &env->tos, sizeof(env->tos)) < 0)
 	{
 		perror("setsockopt");
 		close(env->sockfd);
