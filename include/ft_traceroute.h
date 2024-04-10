@@ -42,8 +42,10 @@ typedef struct	s_env
 	int					tos;
 	int 				seq;
 	struct in_addr		source;
+	char 				*interface;
 }	t_env;
 
+void	init_socket(t_env *env);
 int		send_icmp_packet(t_env *env);
 int		recv_icmp_packet(t_env *env, struct sockaddr_in *from_addr);
 double	get_elapsed_time(struct timeval *start_time, struct timeval *end_time);

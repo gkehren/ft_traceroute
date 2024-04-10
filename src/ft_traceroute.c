@@ -1,5 +1,4 @@
 #include "../include/ft_traceroute.h"
-#include <netinet/ip_icmp.h>
 
 double	get_elapsed_time(struct timeval *start_time, struct timeval *end_time)
 {

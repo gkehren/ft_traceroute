@@ -1,4 +1,4 @@
-FILES:= main ft_traceroute parse
+FILES:= main socket ft_traceroute parse
 NAME:= ft_traceroute
 
 # ------------------

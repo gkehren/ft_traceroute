@@ -9,6 +9,7 @@ void	init_default_env(t_env *env)
 	env->tos = 8; // 8 = IPTOS_LOWDELAY | 16 = IPTOS_THROUGHPUT | 32 = IPTOS_RELIABILITY | 128 = IPTOS_MINCOST
 	env->seq = 0; // ICMP sequence number
 	env->source.s_addr = INADDR_ANY; // source address
+	env->interface = NULL; // interface
 }
 
 void	parse_args(t_env *env, int argc, char **argv)
@@ -29,6 +30,11 @@ void	parse_args(t_env *env, int argc, char **argv)
 			printf(" <host> Destination IP address or hostname\n");
 			printf(" --help       Display this information\n");
 			printf(" -m=<max_hops> Set the max number of hops\n");
+			printf(" -i=<interface> Set the interface to use\n");
+			printf(" -p=<port> Set the port to use\n");
+			printf(" -s=<source> Set the source address\n");
+			printf(" -q=<nprobes> Set the number of probes per hop\n");
+			printf(" -t=<tos> Set the type of service\n");
 			exit(EXIT_SUCCESS);
 		}
 		else if (strncmp(argv[i], "-m=", 3) == 0)
@@ -75,19 +81,13 @@ void	parse_args(t_env *env, int argc, char **argv)
 				exit(EXIT_FAILURE);
 			}
 		}
+		else if (strncmp(argv[i], "-i=", 3) == 0)
+		{
+			env->interface = argv[i] + 3;
+		}
 		else
 		{
 			env->host = argv[i];
 		}
-		//else if (strncmp(argv[i], "-i=", 3) == 0)
-		//{
-		//	env->interface = argv[i] + 3;
-		//}
-		// -i=<interface> Set the interface to use
-		// -p=<port> Set the port to use
-		// -s=<source> Set the source address
-		// -q=<nprobes> Set the number of probes per hop
-		// -N=<nqueries> Set the number of queries per probe
-		// -t=<tos> Set the type of service
 	}
 }
