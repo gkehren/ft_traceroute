@@ -8,6 +8,7 @@ void	init_default_env(t_env *env)
 	env->nqueries = DEFAULT_NQUERIES; // number of queries per hop
 	env->tos = 8; // 8 = IPTOS_LOWDELAY | 16 = IPTOS_THROUGHPUT | 32 = IPTOS_RELIABILITY | 128 = IPTOS_MINCOST
 	env->seq = 0; // ICMP sequence number
+	env->source.s_addr = INADDR_ANY; // source address
 }
 
 void	parse_args(t_env *env, int argc, char **argv)
@@ -66,6 +67,14 @@ void	parse_args(t_env *env, int argc, char **argv)
 				exit(EXIT_FAILURE);
 			}
 		}
+		else if (strncmp(argv[i], "-s=", 3) == 0)
+		{
+			if (inet_pton(AF_INET, argv[i] + 3, &env->source) != 1)
+			{
+				fprintf(stderr, "Invalid source address\n");
+				exit(EXIT_FAILURE);
+			}
+		}
 		else
 		{
 			env->host = argv[i];
@@ -73,14 +82,6 @@ void	parse_args(t_env *env, int argc, char **argv)
 		//else if (strncmp(argv[i], "-i=", 3) == 0)
 		//{
 		//	env->interface = argv[i] + 3;
-		//}
-		//else if (strncmp(argv[i], "-s=", 3) == 0)
-		//{
-		//	if (inet_pton(AF_INET, argv[i] + 3, &env->source) != 1)
-		//	{
-		//		fprintf(stderr, "Invalid source address\n");
-		//		exit(EXIT_FAILURE);
-		//	}
 		//}
 		// -i=<interface> Set the interface to use
 		// -p=<port> Set the port to use

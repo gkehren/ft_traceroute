@@ -35,7 +35,6 @@ void	ft_traceroute(t_env* env)
 	{
 		if (reached)
 			break;
-		printf(" %d ", env->ttl);
 		for (int i = 0; i < env->nqueries; i++)
 		{
 			// Send ICMP packet
@@ -46,6 +45,7 @@ void	ft_traceroute(t_env* env)
 				exit(EXIT_FAILURE);
 			}
 
+			printf(" %d ", env->ttl);
 			// Receive ICMP packet
 			struct sockaddr_in from_addr;
 			if (recv_icmp_packet(env, &from_addr) < 0)
@@ -102,6 +102,16 @@ void	init_socket(t_env *env)
 	if (setsockopt(env->sockfd, IPPROTO_IP, IP_TOS, &env->tos, sizeof(env->tos)) < 0)
 	{
 		perror("setsockopt");
+		close(env->sockfd);
+		exit(EXIT_FAILURE);
+	}
+	struct sockaddr_in src_addr;
+	memset(&src_addr, 0, sizeof(struct sockaddr_in));
+	src_addr.sin_family = AF_INET;
+	src_addr.sin_addr = env->source;
+	if (bind(env->sockfd, (struct sockaddr *)&src_addr, sizeof(struct sockaddr_in)) < 0)
+	{
+		perror("bind");
 		close(env->sockfd);
 		exit(EXIT_FAILURE);
 	}

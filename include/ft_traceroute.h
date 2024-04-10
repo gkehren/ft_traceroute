@@ -41,6 +41,7 @@ typedef struct	s_env
 	int					nqueries;
 	int					tos;
 	int 				seq;
+	struct in_addr		source;
 }	t_env;
 
 int		send_icmp_packet(t_env *env);
