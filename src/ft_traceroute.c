@@ -33,7 +33,7 @@ int send_icmp_packet(t_env *env)
 	memset(&packet, 0, sizeof(t_packet));
 
 	// Set ICMP header
-	packet.header.type = ICMP_ECHO; // Type=
+	packet.header.type = ICMP_ECHO; // Type=8 (ICMP_ECHO)
 	packet.header.un.echo.id = htons(getpid()); // ID
 	packet.header.un.echo.sequence = env->seq++; // Sequence
 

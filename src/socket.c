@@ -9,8 +9,6 @@ void	set_sockopts(t_env *env)
 		close(env->sockfd);
 		exit(EXIT_FAILURE);
 	}
-
-	// Bonus (make another function for this part)
 	if (setsockopt(env->sockfd, IPPROTO_IP, IP_TOS, &env->tos, sizeof(env->tos)) < 0)
 	{
 		perror("setsockopt");
